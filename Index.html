@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>মার্টিংগেল প্যাটার্ন ক্যালকুলেটর</title>
+    <style>
+        :root {
+            --primary-color: #4a6baf;
+            --win-color: #d4edda;
+            --lose-color: #f8d7da;
+            --table-border: #dee2e6;
+            --header-bg: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-size: 28px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .input-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #555;
+            min-width: 180px;
+        }
+        
+        input[type="number"] {
+            width: 120px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 107, 175, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #3a5a9f;
+        }
+        
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        th, td {
+            border: 1px solid var(--table-border);
+            padding: 12px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: var(--header-bg);
+            font-weight: 600;
+            color: #333;
+        }
+        
+        tr.win {
+            background-color: var(--win-color);
+        }
+        
+        tr.lose {
+            background-color: var(--lose-color);
+        }
+        
+        .summary {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .summary h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .summary-label {
+            font-weight: 600;
+        }
+        
+        @media (max-width: 600px) {
+            .form-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            input[type="number"] {
+                width: 100%;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>মার্টিংগেল প্যাটার্ন ক্যালকুলেটর</h1>
+
+<div class="input-section">
+    <div class="form-group">
+        <label for="startBet">প্রাথমিক বাজির পরিমাণ (৳):</label>
+        <input type="number" id="startBet" value="10" min="1" step="1" />
+    </div>
+    
+    <div class="form-group">
+        <label for="payout">পayout গুণফল (%):</label>
+        <input type="number" id="payout" value="196" min="101" max="200" step="1" />
+        <span class="info-text">(সাধারণত 195%-200%, 196% = 1.96x)</span>
+    </div>
+    
+    <div class="form-group">
+        <label for="maxRounds">সর্বোচ্চ রাউন্ড সংখ্যা:</label>
+        <input type="number" id="maxRounds" value="10" min="1" max="15" step="1" />
+        <span class="info-text">(সাধারণত 10-15 রাউন্ডের মধ্যে সীমিত রাখুন)</span>
+    </div>
+    
+    <button onclick="generatePattern()">প্যাটার্ন তৈরি করুন</button>
+</div>
+
+<table id="resultTable">
+    <thead>
+        <tr>
+            <th>রাউন্ড</th>
+            <th>বাজি (৳)</th>
+            <th>ফলাফল</th>
+            <th>সঞ্চিত লস (৳)</th>
+            <th>জিতলে প্রাপ্তি (৳)</th>
+            <th>নিট লাভ (৳)</th>
+            <th>পরবর্তী বাজি (৳)</th>
+        </tr>
+    </thead>
+    <tbody id="resultBody"></tbody>
+</table>
+
+<div class="summary" id="summarySection">
+    <h3>সারসংক্ষেপ</h3>
+    <div class="summary-item">
+        <span class="summary-label">প্রাথমিক বাজি:</span>
+        <span id="summaryInitialBet">৳0.00</span>
+    </div>
+    <div class="summary-item">
+        <span class="summary-label">সর্বোচ্চ সম্ভাব্য লস:</span>
+        <span id="summaryMaxLoss">৳0.00</span>
+    </div>
+    <div class="summary-item">
+        <span class="summary-label">প্রত্যাশিত নিট লাভ:</span>
+        <span id="summaryNetProfit">৳0.00</span>
+    </div>
+    <div class="summary-item">
+        <span class="summary-label">প্রয়োজনীয় ব্যালেন্স:</span>
+        <span id="summaryRequiredBalance">৳0.00</span>
+    </div>
+</div>
+
+<script>
+    function generatePattern() {
+        // ইনপুট মানগুলো পড়া
+        const startBet = parseFloat(document.getElementById("startBet").value);
+        const payoutPercentage = parseFloat(document.getElementById("payout").value);
+        const maxRounds = parseInt(document.getElementById("maxRounds").value);
+        
+        // ভ্যালিডেশন
+        if (isNaN(startBet) || startBet <= 0) {
+            alert("অনুগ্রহ করে একটি বৈধ প্রাথমিক বাজির পরিমাণ দিন!");
+            return;
+        }
+        
+        if (isNaN(payoutPercentage) || payoutPercentage < 101 || payoutPercentage > 200) {
+            alert("পayout গুণফল 101% থেকে 200% এর মধ্যে হতে হবে!");
+            return;
+        }
+        
+        if (isNaN(maxRounds) || maxRounds < 1 || maxRounds > 15) {
+            alert("রাউন্ড সংখ্যা 1 থেকে 15 এর মধ্যে হতে হবে!");
+            return;
+        }
+        
+        const payoutMultiplier = payoutPercentage / 100;
+        const targetProfit = startBet; // প্রথম বাজির সমান লাভ লক্ষ্য
+        
+        let tableBody = document.getElementById("resultBody");
+        tableBody.innerHTML = ""; // আগের ফলাফল মুছে ফেলা
+        
+        let totalLoss = 0;
+        let bet = startBet;
+        let maxPotentialLoss = 0;
+        
+        for (let round = 1; round <= maxRounds; round++) {
+            // রাউন্ডে জিতলে কত পাবেন
+            let winAmount = (bet * payoutMultiplier);
+            let netProfit = (winAmount - totalLoss - bet).toFixed(2);
+            
+            // শেষ রাউন্ডে জিতলে
+            let isWin = (round === maxRounds);
+            
+            // মোট লস: আগের সব হার + এই বাজি (যদি হারি)
+            if (!isWin) {
+                totalLoss += bet;
+                maxPotentialLoss = totalLoss;
+            }
+            
+            // পরবর্তী বাজি হিসাব (হারলে)
+            let nextBet = "";
+            if (!isWin) {
+                nextBet = ((totalLoss + targetProfit) / (payoutMultiplier - 1)).toFixed(2);
+            }
+            
+            // লস দেখাবো শুধু যদি হারি, আর শেষ রাউন্ডে জিতলে ০ দেখাবো
+            let displayLoss = isWin ? 0 : totalLoss;
+            
+            // টেবিলের সারি তৈরি
+            let row = document.createElement("tr");
+            row.className = isWin ? "win" : "lose";
+            
+            row.innerHTML = `
+                <td>${round}</td>
+                <td>${bet.toFixed(2)}</td>
+                <td>${isWin ? "জয়" : "পরাজয়"}</td>
+                <td>${displayLoss.toFixed(2)}</td>
+                <td>${winAmount.toFixed(2)}</td>
+                <td>${isWin ? netProfit : "-"}</td>
+                <td>${isWin ? "-" : nextBet}</td>
+            `;
+            
+            tableBody.appendChild(row);
+            
+            if (isWin) break;
+            
+            bet = parseFloat(nextBet);
+        }
+        
+        // টেবিল এবং সারসংক্ষেপ দেখানো
+        document.getElementById("resultTable").style.display = "table";
+        document.getElementById("summarySection").style.display = "block";
+        
+        // সারসংক্ষেপ আপডেট করা
+        document.getElementById("summaryInitialBet").textContent = `৳${startBet.toFixed(2)}`;
+        document.getElementById("summaryMaxLoss").textContent = `৳${maxPotentialLoss.toFixed(2)}`;
+        document.getElementById("summaryNetProfit").textContent = `৳${targetProfit.toFixed(2)}`;
+        document.getElementById("summaryRequiredBalance").textContent = `৳${(maxPotentialLoss + parseFloat(bet.toFixed(2))).toFixed(2)}`;
+    }
+</script>
+
+</body>
+</html>
