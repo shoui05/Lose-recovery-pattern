@@ -1,297 +1,423 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>মার্টিংগেল প্যাটার্ন ক্যালকুলেটর</title>
+    <title>Martingale Pattern Calculator</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         :root {
-            --primary-color: #4a6baf;
-            --win-color: #d4edda;
-            --lose-color: #f8d7da;
-            --table-border: #dee2e6;
-            --header-bg: #f8f9fa;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #475569;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
             padding: 20px;
-            background: #f5f7fa;
-            color: #333;
             line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
         }
         
         h1 {
             text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 25px;
-            font-size: 28px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--primary-color);
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
-        .input-section {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            margin: 24px 0px;
+            border: 1px solid var(--border);
         }
         
         .form-group {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            margin-bottom: 20px;
         }
         
-        label {
+        .form-group label {
+            display: block;
             font-weight: 600;
-            color: #555;
-            min-width: 180px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-prefix {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-weight: 600;
         }
         
         input[type="number"] {
-            width: 120px;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            width: 100%;
+            padding: 12px 12px 12px 32px;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
             font-size: 16px;
+            transition: all 0.3s ease;
         }
         
         input[type="number"]:focus {
-            border-color: var(--primary-color);
+            border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(74, 107, 175, 0.2);
-        }
-        
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: background-color 0.3s;
-            margin-top: 10px;
-        }
-        
-        button:hover {
-            background-color: #3a5a9f;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
         
         .info-text {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-            font-style: italic;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            display: block;
+        }
+        
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 24px;
+            border-radius: 12px;
+            display: none;
         }
         
         table {
             width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: none;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-card);
         }
         
         th, td {
-            border: 1px solid var(--table-border);
-            padding: 12px;
+            padding: 14px 12px;
             text-align: center;
+            border-bottom: 1px solid var(--border);
         }
         
         th {
-            background-color: var(--header-bg);
+            background: var(--bg-input);
             font-weight: 600;
-            color: #333;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+        
+        th:last-child {
+            border-radius: 0 12px 0 0;
         }
         
         tr.win {
-            background-color: var(--win-color);
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+        }
+        
+        tr.win td {
+            color: var(--success);
+            font-weight: 600;
         }
         
         tr.lose {
-            background-color: var(--lose-color);
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+        }
+        
+        tr.lose td {
+            color: var(--danger);
         }
         
         .summary {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             display: none;
         }
         
         .summary h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            font-weight: 700;
         }
         
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .summary-card {
+            background: var(--bg-input);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
         }
         
         .summary-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
             font-weight: 600;
         }
         
-        @media (max-width: 600px) {
-            .form-group {
-                flex-direction: column;
-                align-items: flex-start;
+        .badge-success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+        
+        .badge-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 24px;
             }
             
-            input[type="number"] {
-                width: 100%;
+            .card {
+                padding: 16px;
             }
             
             th, td {
-                padding: 8px;
-                font-size: 14px;
+                padding: 10px 6px;
+                font-size: 13px;
+            }
+            
+            .summary-value {
+                font-size: 20px;
             }
         }
     </style>
 </head>
 <body>
 
-<h1>মার্টিংগেল প্যাটার্ন ক্যালকুলেটর</h1>
+<div class="container">
+    <h1>Martingale Pattern Calculator</h1>
+    <p class="subtitle">Calculate your betting strategy with precision</p>
 
-<div class="input-section">
-    <div class="form-group">
-        <label for="startBet">প্রাথমিক বাজির পরিমাণ (৳):</label>
-        <input type="number" id="startBet" value="10" min="1" step="1" />
+    <div class="card">
+        <div class="form-group">
+            <label for="startBet">Initial Bet Amount</label>
+            <div class="input-wrapper">
+                <span class="input-prefix">$</span>
+                <input type="number" id="startBet" value="10" min="1" step="1" />
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="payout">Payout Multiplier (%)</label>
+            <div class="input-wrapper">
+                <span class="input-prefix">%</span>
+                <input type="number" id="payout" value="196" min="101" max="200" step="1" />
+            </div>
+            <span class="info-text">Typically 195%-200% (e.g., 196% = 1.96x)</span>
+        </div>
+        
+        <div class="form-group">
+            <label for="maxRounds">Maximum Rounds</label>
+            <div class="input-wrapper">
+                <span class="input-prefix">#</span>
+                <input type="number" id="maxRounds" value="10" min="1" max="15" step="1" />
+            </div>
+            <span class="info-text">Recommended to limit between 10-15 rounds</span>
+        </div>
+        
+        <button onclick="generatePattern()">Generate Pattern</button>
     </div>
-    
-    <div class="form-group">
-        <label for="payout">পayout গুণফল (%):</label>
-        <input type="number" id="payout" value="196" min="101" max="200" step="1" />
-        <span class="info-text">(সাধারণত 195%-200%, 196% = 1.96x)</span>
-    </div>
-    
-    <div class="form-group">
-        <label for="maxRounds">সর্বোচ্চ রাউন্ড সংখ্যা:</label>
-        <input type="number" id="maxRounds" value="10" min="1" max="15" step="1" />
-        <span class="info-text">(সাধারণত 10-15 রাউন্ডের মধ্যে সীমিত রাখুন)</span>
-    </div>
-    
-    <button onclick="generatePattern()">প্যাটার্ন তৈরি করুন</button>
-</div>
 
-<table id="resultTable">
-    <thead>
-        <tr>
-            <th>রাউন্ড</th>
-            <th>বাজি (৳)</th>
-            <th>ফলাফল</th>
-            <th>সঞ্চিত লস (৳)</th>
-            <th>জিতলে প্রাপ্তি (৳)</th>
-            <th>নিট লাভ (৳)</th>
-            <th>পরবর্তী বাজি (৳)</th>
-        </tr>
-    </thead>
-    <tbody id="resultBody"></tbody>
-</table>
+    <div class="table-wrapper" id="tableWrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Round</th>
+                    <th>Bet</th>
+                    <th>Result</th>
+                    <th>Total Loss</th>
+                    <th>Win Amount</th>
+                    <th>Net Profit</th>
+                    <th>Next Bet</th>
+                </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+        </table>
+    </div>
 
-<div class="summary" id="summarySection">
-    <h3>সারসংক্ষেপ</h3>
-    <div class="summary-item">
-        <span class="summary-label">প্রাথমিক বাজি:</span>
-        <span id="summaryInitialBet">৳0.00</span>
-    </div>
-    <div class="summary-item">
-        <span class="summary-label">সর্বোচ্চ সম্ভাব্য লস:</span>
-        <span id="summaryMaxLoss">৳0.00</span>
-    </div>
-    <div class="summary-item">
-        <span class="summary-label">প্রত্যাশিত নিট লাভ:</span>
-        <span id="summaryNetProfit">৳0.00</span>
-    </div>
-    <div class="summary-item">
-        <span class="summary-label">প্রয়োজনীয় ব্যালেন্স:</span>
-        <span id="summaryRequiredBalance">৳0.00</span>
+    <div class="card summary" id="summarySection">
+        <h3>Summary</h3>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <span class="summary-label">Initial Bet</span>
+                <div class="summary-value" id="summaryInitialBet">$0.00</div>
+            </div>
+            <div class="summary-card">
+                <span class="summary-label">Max Potential Loss</span>
+                <div class="summary-value" id="summaryMaxLoss">$0.00</div>
+            </div>
+            <div class="summary-card">
+                <span class="summary-label">Expected Net Profit</span>
+                <div class="summary-value" id="summaryNetProfit">$0.00</div>
+            </div>
+            <div class="summary-card">
+                <span class="summary-label">Required Balance</span>
+                <div class="summary-value" id="summaryRequiredBalance">$0.00</div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     function generatePattern() {
-        // ইনপুট মানগুলো পড়া
         const startBet = parseFloat(document.getElementById("startBet").value);
         const payoutPercentage = parseFloat(document.getElementById("payout").value);
         const maxRounds = parseInt(document.getElementById("maxRounds").value);
         
-        // ভ্যালিডেশন
         if (isNaN(startBet) || startBet <= 0) {
-            alert("অনুগ্রহ করে একটি বৈধ প্রাথমিক বাজির পরিমাণ দিন!");
+            alert("Please enter a valid initial bet amount!");
             return;
         }
         
         if (isNaN(payoutPercentage) || payoutPercentage < 101 || payoutPercentage > 200) {
-            alert("পayout গুণফল 101% থেকে 200% এর মধ্যে হতে হবে!");
+            alert("Payout multiplier must be between 101% and 200%!");
             return;
         }
         
         if (isNaN(maxRounds) || maxRounds < 1 || maxRounds > 15) {
-            alert("রাউন্ড সংখ্যা 1 থেকে 15 এর মধ্যে হতে হবে!");
+            alert("Number of rounds must be between 1 and 15!");
             return;
         }
         
         const payoutMultiplier = payoutPercentage / 100;
-        const targetProfit = startBet; // প্রথম বাজির সমান লাভ লক্ষ্য
+        const targetProfit = startBet;
         
         let tableBody = document.getElementById("resultBody");
-        tableBody.innerHTML = ""; // আগের ফলাফল মুছে ফেলা
+        tableBody.innerHTML = "";
         
         let totalLoss = 0;
         let bet = startBet;
         let maxPotentialLoss = 0;
         
         for (let round = 1; round <= maxRounds; round++) {
-            // রাউন্ডে জিতলে কত পাবেন
             let winAmount = (bet * payoutMultiplier);
             let netProfit = (winAmount - totalLoss - bet).toFixed(2);
             
-            // শেষ রাউন্ডে জিতলে
             let isWin = (round === maxRounds);
             
-            // মোট লস: আগের সব হার + এই বাজি (যদি হারি)
             if (!isWin) {
                 totalLoss += bet;
                 maxPotentialLoss = totalLoss;
             }
             
-            // পরবর্তী বাজি হিসাব (হারলে)
             let nextBet = "";
             if (!isWin) {
                 nextBet = ((totalLoss + targetProfit) / (payoutMultiplier - 1)).toFixed(2);
             }
             
-            // লস দেখাবো শুধু যদি হারি, আর শেষ রাউন্ডে জিতলে ০ দেখাবো
             let displayLoss = isWin ? 0 : totalLoss;
             
-            // টেবিলের সারি তৈরি
             let row = document.createElement("tr");
             row.className = isWin ? "win" : "lose";
             
             row.innerHTML = `
-                <td>${round}</td>
-                <td>${bet.toFixed(2)}</td>
-                <td>${isWin ? "জয়" : "পরাজয়"}</td>
-                <td>${displayLoss.toFixed(2)}</td>
-                <td>${winAmount.toFixed(2)}</td>
-                <td>${isWin ? netProfit : "-"}</td>
-                <td>${isWin ? "-" : nextBet}</td>
+                <td><strong>${round}</strong></td>
+                <td>$${bet.toFixed(2)}</td>
+                <td><span class="badge ${isWin ? 'badge-success' : 'badge-danger'}">${isWin ? "Win" : "Loss"}</span></td>
+                <td>$${displayLoss.toFixed(2)}</td>
+                <td>$${winAmount.toFixed(2)}</td>
+                <td>${isWin ? '$' + netProfit : "-"}</td>
+                <td>${isWin ? "-" : '$' + nextBet}</td>
             `;
             
             tableBody.appendChild(row);
@@ -301,15 +427,13 @@
             bet = parseFloat(nextBet);
         }
         
-        // টেবিল এবং সারসংক্ষেপ দেখানো
-        document.getElementById("resultTable").style.display = "table";
+        document.getElementById("tableWrapper").style.display = "block";
         document.getElementById("summarySection").style.display = "block";
         
-        // সারসংক্ষেপ আপডেট করা
-        document.getElementById("summaryInitialBet").textContent = `৳${startBet.toFixed(2)}`;
-        document.getElementById("summaryMaxLoss").textContent = `৳${maxPotentialLoss.toFixed(2)}`;
-        document.getElementById("summaryNetProfit").textContent = `৳${targetProfit.toFixed(2)}`;
-        document.getElementById("summaryRequiredBalance").textContent = `৳${(maxPotentialLoss + parseFloat(bet.toFixed(2))).toFixed(2)}`;
+        document.getElementById("summaryInitialBet").textContent = `$${startBet.toFixed(2)}`;
+        document.getElementById("summaryMaxLoss").textContent = `$${maxPotentialLoss.toFixed(2)}`;
+        document.getElementById("summaryNetProfit").textContent = `$${targetProfit.toFixed(2)}`;
+        document.getElementById("summaryRequiredBalance").textContent = `$${(maxPotentialLoss + parseFloat(bet.toFixed(2))).toFixed(2)}`;
     }
 </script>
 
